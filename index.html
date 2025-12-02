@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cube SDF Ray Marching</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid #333;
+            display: block;
+        }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <div>Cube SDF Ray Marching</div>
+        <div>Use mouse to rotate (click and drag)</div>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script src="sdf-cube.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = 200;
+        canvas.height = 200;
+        
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Image data for pixel manipulation
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+        
+        // Rotation variables
+        let rotationX = 0;
+        let rotationY = 0;
+        
+        // Mouse controls
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        
+        // Mouse controls
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastMouseX;
+                const deltaY = e.clientY - lastMouseY;
+                
+                rotationY += deltaX * 0.01;
+                rotationX += deltaY * 0.01;
+                
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                
+                render(canvas, ctx, imageData, data);
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+        
+        // Initial render
+        render(canvas, ctx, imageData, data);
+    </script>
+</body>
+</html>
+
