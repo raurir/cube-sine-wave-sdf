@@ -11,6 +11,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 20px;
         min-height: 100vh;
         background: #1a1a1a;
         font-family: Arial, sans-serif;
@@ -33,16 +34,21 @@
       <div>Cube SDF Ray Marching</div>
     </div>
     <canvas id="canvas"></canvas>
+    <canvas id="waveCanvas"></canvas>
 
     <script src="sdf-cube.js"></script>
     <!-- <script src="sdf-cube.min.js"></script> -->
     <script>
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
+      const waveCanvas = document.getElementById("waveCanvas");
+      const waveCtx = waveCanvas.getContext("2d");
 
       // Set canvas size
       canvas.width = 200;
       canvas.height = 200;
+      waveCanvas.width = 200;
+      waveCanvas.height = 200;
 
       const width = canvas.width;
       const height = canvas.height;
@@ -55,7 +61,7 @@
         const rotationY = t * 0.0005;
         const rotationX = t * 0.00089
 
-        d(canvas, ctx, imageData, data, rotationX, rotationY);
+        d(t, canvas, ctx, imageData, data, waveCanvas, waveCtx, rotationX, rotationY);
         requestAnimationFrame(animate);
       };
       animate(0);
