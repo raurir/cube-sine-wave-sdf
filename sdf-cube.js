@@ -41,14 +41,17 @@ let e = 0.01, // epsilon
 	/**
 	 * Ray marching function
 	 */
-	z = (origin, direction, rotationX, rotationY) => {
+	z = (rx, ry, rz, rotationX, rotationY) => {
 		let t = 0;
 
-		for (let i = 0; i < 100; i++) {
-			let point = [origin[0] + direction[0] * t, origin[1] + direction[1] * t, origin[2] + direction[2] * t];
+		// for (let i = 0; i < 99; i++) {
+		while (t < 99) {
+			let x = rx * t,
+				y = ry * t,
+				z = -5 + rz * t; // inc camera position z
 
 			// Rotate the point to match camera rotation
-			let [px, py, pz] = r(point[0], point[1], point[2], rotationX, rotationY);
+			let [px, py, pz] = r(x, y, z, rotationX, rotationY);
 
 			// Calculate distance to cube
 			let dist = c(px, py, pz);
@@ -57,117 +60,108 @@ let e = 0.01, // epsilon
 				// Hit! Calculate normal for shading
 				return n(px, py, pz);
 			}
-
 			t += dist;
-
-			if (t > 100) {
-				break;
-			}
 		}
-
 		// return nothing if no hit
 	},
 	/**
 	 * Render function
 	 */
-	d = (time, canvas, ctx, imageData, data, waveCanvas, waveCtx, rotationX, rotationY) => {
-		let width = canvas.width;
-		let height = canvas.height;
-		let cameraPos = [0, 0, -5];
-		// let fov = 1;
-		// let aspect = width / height;
-		let tanFovAspect = 0.5; // tan(fov / 2);
+	d = (time, rotationX, rotationY) => {
+		let size = 400;
+
+		let tanFovAspect = 0.5; // tan(field of vision / 2);
 		let intensities = [];
 
-		for (let y = 0; y < height; y++) {
-			for (let x = 0; x < width; x++) {
-				// Convert pixel coordinates to normalized device coordinates
-				let ndcX = (x / width) * 2 - 1;
-				let ndcY = 1 - (y / height) * 2;
+		for (let i = 0; i < size * size; i++) {
+			let x = i % size;
+			let y = ~~(i / size);
+			// Convert pixel coordinates to normalized device coordinates
+			let ndcX = (x / size) * 2 - 1;
+			let ndcY = 1 - (y / size) * 2;
 
-				// Calculate ray direction
-				let rayDir = [
+			// Calculate ray direction
+			let rx =
 					tanFovAspect *
-						// aspect * // this assumes an aspect of 1, ie square canvas!
-						ndcX,
-					tanFovAspect * ndcY,
-					1,
-				];
+					// aspect * // assuming an aspect of 1, ie square canvas, no need for this
+					ndcX,
+				ry = tanFovAspect * ndcY,
+				rz = 1;
 
-				// Normalize ray direction
-				let len = _(rayDir[0] * rayDir[0] + rayDir[1] * rayDir[1] + rayDir[2] * rayDir[2]);
-				rayDir[0] /= len;
-				rayDir[1] /= len;
-				rayDir[2] /= len;
+			// Normalize ray direction
+			let len = _(rx * rx + ry * ry + rz * rz);
+			rx /= len;
+			ry /= len;
+			rz /= len;
 
-				// Ray march
-				let result = z(cameraPos, rayDir, rotationX, rotationY);
+			// Ray march
+			let result = z(rx, ry, rz, rotationX, rotationY);
 
-				let idx = (y * width + x) * 4;
-				let intensity = 0;
+			// let idx = i * 4;
 
-				if (!intensities[y]) intensities[y] = [];
+			if (result) {
+				// Rotate normal back to world space (inverse: -X then -Y)
+				let [nx, ny, nz] = result;
+				let cosX = C(-rotationX),
+					sinX = S(-rotationX);
+				let z1 = ny * sinX + nz * cosX;
+				let cosY = C(-rotationY),
+					sinY = S(-rotationY);
+				// let worldNormal = [n[0] * cosY + z1 * sinY, y1, -n[0] * sinY + z1 * cosY];
+				// let dot = M(0, -worldNormal[0]);
+				let worldNormal = nx * cosY + z1 * sinY;
+				let dot = M(0, -worldNormal);
 
-				if (result) {
-					// Rotate normal back to world space (inverse: -X then -Y)
-					let n = result;
-					let cosX = C(-rotationX),
-						sinX = S(-rotationX);
-					let y1 = n[1] * cosX - n[2] * sinX,
-						z1 = n[1] * sinX + n[2] * cosX;
-					let cosY = C(-rotationY),
-						sinY = S(-rotationY);
-					let worldNormal = [n[0] * cosY + z1 * sinY, y1, -n[0] * sinY + z1 * cosY];
+				// Ambient + diffuse lighting
+				// let ambient = 0.2;
+				// intensity = ambient + (1 - ambient) * dot;
+				intensity = 0.2 + 0.8 * dot;
 
-					let dot = M(0, -worldNormal[0]);
+				// Color the cube (cyan-ish)
 
-					// Ambient + diffuse lighting
-					let ambient = 0.2;
-					intensity = ambient + (1 - ambient) * dot;
+				/*
+				data[idx] = 100 * intensity; // R
+				data[idx + 1] = 200 * intensity; // G
+				data[idx + 2] = 255 * intensity; // B
+				data[idx + 3] = 255; // A
+        //*/
 
-					// Color the cube (cyan-ish)
-					data[idx] = 100 * intensity; // R
-					data[idx + 1] = 200 * intensity; // G
-					data[idx + 2] = 255 * intensity; // B
-					data[idx + 3] = 255; // A
-
-					intensities[y][x] = intensity;
-				} else {
-					// Background gradient
-					let bgIntensity = 0.1;
-					intensity = bgIntensity;
-					data[idx] = bgIntensity * 50;
-					data[idx + 1] = bgIntensity * 50;
-					data[idx + 2] = bgIntensity * 60;
-					data[idx + 3] = 255;
-
-					intensities[y][x] = 0;
-				}
+				intensities[i] = intensity;
+			} else {
+				// Background gradient
+				/*
+				let bgIntensity = 0.1;
+				data[idx] = bgIntensity * 50;
+				data[idx + 1] = bgIntensity * 50;
+				data[idx + 2] = bgIntensity * 60;
+				data[idx + 3] = 255;
+        //*/
+				// intensities[i] = 0; // no need, leave it empty
 			}
 		}
 
-		ctx.putImageData(imageData, 0, 0);
+		// ctx.putImageData(imageData, 0, 0);
 
-		// Draw horizontal sine waves to second canvas
-		waveCtx.fillRect(0, 0, width, height);
-		waveCtx.strokeStyle = "#fff";
+		// Draw horizontal sine waves
+		X.fillRect(0, 0, size, size);
+		X.strokeStyle = "#fff";
 		let numWaves = 20;
-		let waveSpacing = height / numWaves;
+		let waveSpacing = size / numWaves;
 
 		for (let w = 0; w < numWaves; w++) {
 			let y = (w + 0.5) * waveSpacing;
-			// Draw sine wave with amplitude based on row intensity
-			waveCtx.beginPath();
-			for (let x = 0; x < width; x++) {
-				const intense = intensities[y][x];
-				let amplitude = intense * height * 0.03;
+			// Draw sine wave with amplitude
+			X.beginPath();
+			for (let x = 0; x < size; x++) {
+				const intense = intensities[x + y * size] || 0;
+				let amplitude = intense * size * 0.03;
 				let waveY = y + S(x * 0.6 + time * 0.004) * amplitude;
-				if (x === 0) {
-					waveCtx.moveTo(x, waveY);
-				} else {
-					waveCtx.lineTo(x, waveY);
+				if (x) {
+					X.lineTo(x, waveY);
+        } else {
+					X.moveTo(x, waveY);
 				}
 			}
-			waveCtx.stroke();
+			X.stroke();
 		}
 	};
