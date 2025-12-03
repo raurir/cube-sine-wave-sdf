@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "minify": "terser sdf-cube.js -c -m -o sdf-cube.min.js",
-    "size": "wc -c sdf-cube.js sdf-cube.min.js"
+    "size": "wc -c sdf-cube.js sdf-cube.min.js",
+    "min": "yarn minify && yarn size"
   },
   "devDependencies": {
     "terser": "^5.44.1"

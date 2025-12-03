@@ -34,8 +34,8 @@
     </div>
     <canvas id="canvas"></canvas>
 
-    <!-- <script src="sdf-cube.js"></script> -->
-    <script src="sdf-cube.min.js"></script>
+    <script src="sdf-cube.js"></script>
+    <!-- <script src="sdf-cube.min.js"></script> -->
     <script>
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
@@ -55,7 +55,7 @@
         const rotationY = t * 0.0005;
         const rotationX = t * 0.00089
 
-        render(canvas, ctx, imageData, data, rotationX, rotationY);
+        d(canvas, ctx, imageData, data, rotationX, rotationY);
         requestAnimationFrame(animate);
       };
       animate(0);
