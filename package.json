@@ -1,0 +1,14 @@
+{
+  "name": "sdf-cube",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "raurir <rrochford@atlascarbon.ag>",
+  "license": "MIT",
+  "scripts": {
+    "minify": "terser sdf-cube.js -c -m -o sdf-cube.min.js",
+    "size": "wc -c sdf-cube.js sdf-cube.min.js"
+  },
+  "devDependencies": {
+    "terser": "^5.44.1"
+  }
+}

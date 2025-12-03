@@ -1,3 +1,4 @@
+const epsilon = 0.001;
 
 function cubeSDF(x, y, z, size, cx = 0, cy = 0, cz = 0) {
   const px = Math.abs(x - cx) - size;
@@ -11,33 +12,21 @@ function cubeSDF(x, y, z, size, cx = 0, cy = 0, cz = 0) {
   return Math.sqrt(qx * qx + qy * qy + qz * qz) + Math.min(Math.max(px, Math.max(py, pz)), 0);
 }
 
-/**
- * Rotate point around Y axis, then X axis
- */
 function rotatePoint(x, y, z, rotX, rotY) {
-  // Rotate around Y axis
-  const cosY = Math.cos(rotY);
-  const sinY = Math.sin(rotY);
-  const x1 = x * cosY + z * sinY;
-  const z1 = -x * sinY + z * cosY;
-  
-  // Rotate around X axis
-  const cosX = Math.cos(rotX);
-  const sinX = Math.sin(rotX);
-  const y1 = y * cosX - z1 * sinX;
-  const z2 = y * sinX + z1 * cosX;
-  
-  return [x1, y1, z2];
+  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+  const x1 = x * cosY + z * sinY, z1 = -x * sinY + z * cosY;
+  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+  return [x1, y * cosX - z1 * sinX, y * sinX + z1 * cosX];
 }
 
 /**
  * Calculate normal using finite differences
  */
 function calculateNormal(x, y, z) {
-  const eps = 0.001;
-  const dx = cubeSDF(x + eps, y, z, 1.0) - cubeSDF(x - eps, y, z, 1.0);
-  const dy = cubeSDF(x, y + eps, z, 1.0) - cubeSDF(x, y - eps, z, 1.0);
-  const dz = cubeSDF(x, y, z + eps, 1.0) - cubeSDF(x, y, z - eps, 1.0);
+  
+  const dx = cubeSDF(x + epsilon, y, z, 1.0) - cubeSDF(x - epsilon, y, z, 1.0);
+  const dy = cubeSDF(x, y + epsilon, z, 1.0) - cubeSDF(x, y - epsilon, z, 1.0);
+  const dz = cubeSDF(x, y, z + epsilon, 1.0) - cubeSDF(x, y, z - epsilon  , 1.0);
   
   const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
   return [dx / len, dy / len, dz / len];
@@ -46,7 +35,7 @@ function calculateNormal(x, y, z) {
 /**
  * Ray marching function
  */
-function rayMarch(origin, direction, rotationX, rotationY, maxSteps = 100, maxDist = 100, epsilon = 0.001) {
+function rayMarch(origin, direction, rotationX, rotationY, maxSteps = 100, maxDist = 100) {
   let t = 0;
   
   for (let i = 0; i < maxSteps; i++) {
@@ -113,18 +102,14 @@ function render(canvas, ctx, imageData, data, rotationX, rotationY) {
       const idx = (y * width + x) * 4;
       
       if (result.hit) {
-        // Calculate lighting
-        const lightDir = [1, 1, -0.5];
-        const lightLen = Math.sqrt(lightDir[0] * lightDir[0] + lightDir[1] * lightDir[1] + lightDir[2] * lightDir[2]);
-        lightDir[0] /= lightLen;
-        lightDir[1] /= lightLen;
-        lightDir[2] /= lightLen;
+        // Rotate normal back to world space (inverse: -X then -Y)
+        const n = result.normal;
+        const cosX = Math.cos(-rotationX), sinX = Math.sin(-rotationX);
+        const y1 = n[1] * cosX - n[2] * sinX, z1 = n[1] * sinX + n[2] * cosX;
+        const cosY = Math.cos(-rotationY), sinY = Math.sin(-rotationY);
+        const worldNormal = [n[0] * cosY + z1 * sinY, y1, -n[0] * sinY + z1 * cosY];
         
-        const dot = Math.max(0, 
-          result.normal[0] * lightDir[0] + 
-          result.normal[1] * lightDir[1] + 
-          result.normal[2] * lightDir[2]
-        );
+        const dot = Math.max(0, -worldNormal[0]);
         
         // Ambient + diffuse lighting
         const ambient = 0.2;
@@ -151,5 +136,5 @@ function render(canvas, ctx, imageData, data, rotationX, rotationY) {
 
 // Export functions if using modules
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { cubeSDF, rotatePoint, calculateNormal, rayMarch, render };
+  module.exports = { render };
 }
