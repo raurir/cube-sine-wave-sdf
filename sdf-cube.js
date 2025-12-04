@@ -112,11 +112,11 @@ let e = 0.01, // epsilon
 				let ambient = 0.2;
 				let intensity = ambient + (1 - ambient) * dot;
 
-        data[idx] = 100 * intensity; // R
+				data[idx] = 100 * intensity; // R
 				data[idx + 1] = 200 * intensity; // G
 				data[idx + 2] = 255 * intensity; // B
 				data[idx + 3] = 255; // A
-        //*/
+				//*/
 
 				intensities[i] = 0.2 + 0.8 * dot;
 			} else {
@@ -127,8 +127,7 @@ let e = 0.01, // epsilon
 				data[idx + 1] = bgIntensity * 50;
 				data[idx + 2] = bgIntensity * 60;
 				data[idx + 3] = 255;
-        //*/
-
+			//*/
 				// intensities[i] = 0; // no need, leave it empty
 			}
 		}
