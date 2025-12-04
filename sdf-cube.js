@@ -128,7 +128,6 @@ let e = 0.01, // epsilon
 				data[idx + 2] = bgIntensity * 60;
 				data[idx + 3] = 255;
 				//*/
-
 				// intensities[i] = 0; // no need, leave it empty
 			}
 		}
