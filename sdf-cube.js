@@ -27,9 +27,7 @@ let e = 0.01, // epsilon
 			sinX = S(rotX);
 		return [x1, y * cosX - z1 * sinX, y * sinX + z1 * cosX];
 	},
-	/**
-	 * Calculate normal using finite differences
-	 */
+	// Calculate normal using finite differences:
 	n = (x, y, z) => {
 		let dx = c(x + e, y, z) - c(x - e, y, z);
 		let dy = c(x, y + e, z) - c(x, y - e, z);
@@ -38,13 +36,9 @@ let e = 0.01, // epsilon
 		let len = _(dx * dx + dy * dy + dz * dz);
 		return [dx / len, dy / len, dz / len];
 	},
-	/**
-	 * Ray marching function
-	 */
+	// Ray marching function:
 	z = (rx, ry, rz, rotationX, rotationY) => {
 		let t = 0;
-
-		// for (let i = 0; i < 99; i++) {
 		while (t < 99) {
 			let x = rx * t,
 				y = ry * t,
@@ -66,9 +60,7 @@ let e = 0.01, // epsilon
 		}
 		// return nothing if no hit
 	},
-	/**
-	 * Render function
-	 */
+	// Render function:
 	d = (time) => {
 		let rotationX = time * 0.0005,
 			rotationY = time * 0.00089;
@@ -101,6 +93,7 @@ let e = 0.01, // epsilon
 			// Ray march
 			let result = z(rx, ry, rz, rotationX, rotationY);
 
+			// pixel esque shader pixel index:
 			// let idx = i * 4;
 
 			if (result) {
@@ -111,17 +104,15 @@ let e = 0.01, // epsilon
 				let z1 = ny * sinX + nz * cosX;
 				let cosY = C(-rotationY),
 					sinY = S(-rotationY);
-				// let worldNormal = [n[0] * cosY + z1 * sinY, y1, -n[0] * sinY + z1 * cosY];
-				// let dot = M(0, -worldNormal[0]);
 				let worldNormal = nx * cosY + z1 * sinY;
 				let dot = M(0, -worldNormal);
 
-				// Ambient + diffuse lighting
-				// let ambient = 0.2;
-				// intensity = ambient + (1 - ambient) * dot;
-				// Color the cube (cyan-ish)
+				// lighting for pixel esque shader:
 				/*
-				data[idx] = 100 * intensity; // R
+				let ambient = 0.2;
+				let intensity = ambient + (1 - ambient) * dot;
+
+        data[idx] = 100 * intensity; // R
 				data[idx + 1] = 200 * intensity; // G
 				data[idx + 2] = 255 * intensity; // B
 				data[idx + 3] = 255; // A
@@ -129,7 +120,7 @@ let e = 0.01, // epsilon
 
 				intensities[i] = 0.2 + 0.8 * dot;
 			} else {
-				// Background gradient
+				// Background for pixel esque shader:
 				/*
 				let bgIntensity = 0.1;
 				data[idx] = bgIntensity * 50;
@@ -137,10 +128,12 @@ let e = 0.01, // epsilon
 				data[idx + 2] = bgIntensity * 60;
 				data[idx + 3] = 255;
         //*/
+
 				// intensities[i] = 0; // no need, leave it empty
 			}
 		}
 
+		// pixel esque shader:
 		// ctx.putImageData(imageData, 0, 0);
 
 		// Draw horizontal sine waves
