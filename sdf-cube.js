@@ -48,7 +48,9 @@ let e = 0.01, // epsilon
 		while (t < 99) {
 			let x = rx * t,
 				y = ry * t,
-				z = -5 + rz * t; // inc camera position z
+				z =
+					-5 + // camera position z
+					rz * t;
 
 			// Rotate the point to match camera rotation
 			let [px, py, pz] = r(x, y, z, rotationX, rotationY);
@@ -158,7 +160,7 @@ let e = 0.01, // epsilon
 				let waveY = y + S(x * 0.6 + time * 0.004) * amplitude;
 				if (x) {
 					X.lineTo(x, waveY);
-        } else {
+				} else {
 					X.moveTo(x, waveY);
 				}
 			}

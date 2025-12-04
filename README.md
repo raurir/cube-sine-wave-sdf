@@ -12,5 +12,5 @@ Once again, back in the old days (hah), I would hand minify and use whatever cru
 
 If you're interested in more minified code, check TODO raurir/js1k
 
-Todo: sampling full canvas height is pointless 
+
 blog link 
