@@ -99,7 +99,7 @@ let e = 0.01, // epsilon
 			// Ray march
 			let result = z(rx, ry, rz, rotationX, rotationY);
 
-			// let idx = i * 4;
+			let idx = i * 4;
 
 			if (result) {
 				// Rotate normal back to world space (inverse: -X then -Y)
@@ -121,7 +121,7 @@ let e = 0.01, // epsilon
 
 				// Color the cube (cyan-ish)
 
-				/*
+				//*
 				data[idx] = 100 * intensity; // R
 				data[idx + 1] = 200 * intensity; // G
 				data[idx + 2] = 255 * intensity; // B
@@ -131,7 +131,7 @@ let e = 0.01, // epsilon
 				intensities[i] = intensity;
 			} else {
 				// Background gradient
-				/*
+				//*
 				let bgIntensity = 0.1;
 				data[idx] = bgIntensity * 50;
 				data[idx + 1] = bgIntensity * 50;
@@ -142,7 +142,7 @@ let e = 0.01, // epsilon
 			}
 		}
 
-		// ctx.putImageData(imageData, 0, 0);
+		ctx.putImageData(imageData, 0, 0);
 
 		// Draw horizontal sine waves
 		X.fillRect(0, 0, size, size);
