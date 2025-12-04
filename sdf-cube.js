@@ -69,7 +69,9 @@ let e = 0.01, // epsilon
 	/**
 	 * Render function
 	 */
-	d = (time, rotationX, rotationY) => {
+	d = (time) => {
+		let rotationX = time * 0.0005,
+			rotationY = time * 0.00089;
 		let size = 400;
 
 		let tanFovAspect = 0.5; // tan(field of vision / 2);
@@ -117,10 +119,7 @@ let e = 0.01, // epsilon
 				// Ambient + diffuse lighting
 				// let ambient = 0.2;
 				// intensity = ambient + (1 - ambient) * dot;
-				intensity = 0.2 + 0.8 * dot;
-
 				// Color the cube (cyan-ish)
-
 				/*
 				data[idx] = 100 * intensity; // R
 				data[idx + 1] = 200 * intensity; // G
@@ -128,7 +127,7 @@ let e = 0.01, // epsilon
 				data[idx + 3] = 255; // A
         //*/
 
-				intensities[i] = intensity;
+				intensities[i] = 0.2 + 0.8 * dot;
 			} else {
 				// Background gradient
 				/*
@@ -166,4 +165,6 @@ let e = 0.01, // epsilon
 			}
 			X.stroke();
 		}
+
+		requestAnimationFrame(d);
 	};

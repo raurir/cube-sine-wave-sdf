@@ -46,11 +46,7 @@
 			imageData = ctx.createImageData(canvas.width, canvas.height);
 			data = imageData.data;
 
-			const animate = (t) => {
-				d(t, t * 0.0005, t * 0.00089);
-				requestAnimationFrame(animate);
-			};
-			animate(0);
+			d(0);
 		</script>
 	</body>
 </html>
