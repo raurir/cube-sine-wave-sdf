@@ -94,7 +94,7 @@ let e = 0.01, // epsilon
 			let result = z(rx, ry, rz, rotationX, rotationY);
 
 			// pixel esque shader pixel index:
-			// let idx = i * 4;
+			let idx = i * 4;
 
 			if (result) {
 				// Rotate normal back to world space (inverse: -X then -Y)
@@ -108,7 +108,7 @@ let e = 0.01, // epsilon
 				let dot = M(0, -worldNormal);
 
 				// lighting for pixel esque shader:
-				/*
+				//*
 				let ambient = 0.2;
 				let intensity = ambient + (1 - ambient) * dot;
 
@@ -121,19 +121,19 @@ let e = 0.01, // epsilon
 				intensities[i] = 0.2 + 0.8 * dot;
 			} else {
 				// Background for pixel esque shader:
-				/*
+				//*
 				let bgIntensity = 0.1;
 				data[idx] = bgIntensity * 50;
 				data[idx + 1] = bgIntensity * 50;
 				data[idx + 2] = bgIntensity * 60;
 				data[idx + 3] = 255;
-			//*/
+				//*/
 				// intensities[i] = 0; // no need, leave it empty
 			}
 		}
 
 		// pixel esque shader:
-		// ctx.putImageData(imageData, 0, 0);
+		ctx.putImageData(imageData, 0, 0);
 
 		// Draw horizontal sine waves
 		X.fillRect(0, 0, size, size);
